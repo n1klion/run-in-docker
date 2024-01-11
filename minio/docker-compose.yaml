@@ -1,0 +1,31 @@
+version: "3.7"
+
+services:
+  minio:
+    image: minio/minio
+    restart: always
+    volumes: 
+      - "./docker_files/volume/minio:/data"
+    command: server /data --console-address ":9090"
+    ports: 
+      - "9000:9000" 
+      - "9090:9090"
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: dev_pass
+
+  minio-client:
+    image: minio/mc
+    entrypoint: sh
+    depends_on: 
+      - "minio"
+    command: > 
+      -c "/usr/bin/mc config host add minio http://$${MINIO_HOST}:$${MINIO_PORT} $${MINIO_ACCESS_KEY} $${MINIO_SECRET_KEY} --api S3v4 &&
+          /usr/bin/mc mb -p minio/$${MINIO_BUCKET} &&
+          /usr/bin/mc anonymous set public minio/$${MINIO_BUCKET}"
+    environment:
+      MINIO_ACCESS_KEY: admin
+      MINIO_SECRET_KEY: dev_pass
+      MINIO_BUCKET: my.local
+      MINIO_HOST: minio
+      MINIO_PORT: 9000
