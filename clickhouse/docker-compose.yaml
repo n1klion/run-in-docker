@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+  clickhouse:
+    hostname: "clickhouse"
+    container_name: "clickhouse"
+    image: clickhouse/clickhouse-server:22.3.3-alpine
+    restart: always
+    ports:
+      - "8123:8123"
+      - "9000:9000/tcp"
+    volumes:
+      - ./docker_files/volume/clickhouse/config.xml:/etc/clickhouse-server/config.xml
+      - ./docker_files/volume/clickhouse:/var/lib/clickhouse
